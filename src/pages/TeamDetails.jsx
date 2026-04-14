@@ -52,7 +52,7 @@ const TeamDetails = () => {
 
   useEffect(() => {
     if (teamId) fetchTasks();
-  }, [teamId]);
+  }, [teamId,fetchMembers]);
 
   // ✅ SAVE TASK
   const saveTask = async () => {
