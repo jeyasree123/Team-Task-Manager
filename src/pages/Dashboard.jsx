@@ -83,7 +83,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchTeams();
-  }, []);
+  }, [fetchTeams]);
 
   return (
     <div className="dashboard">
