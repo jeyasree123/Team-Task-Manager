@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback} from "react";
+import { useEffect, useState, useCallback } from "react";
 import api from "../api/authApi";
 
 const TeamCollaboration = ({ teamId }) => {
@@ -6,7 +6,7 @@ const TeamCollaboration = ({ teamId }) => {
   const [newMemberName, setNewMemberName] = useState("");
   const [error, setError] = useState("");
 
-  const fetchMembers = async () => {
+  const fetchMembers = useCallback(async () => {
     try {
       const res = await api.get(`/teams/${teamId}/members`);
       setMembers(res.data);
@@ -14,21 +14,18 @@ const TeamCollaboration = ({ teamId }) => {
       console.error(err);
       setError("Failed to load members");
     }
-  };
-  const fetchMembers = useCallback(() => {
-  // API call here
-}, [teamId]);
+  }, [teamId]);
 
   useEffect(() => {
     if (teamId) fetchMembers();
-  }, [teamId,fetchMembers]);
+  }, [teamId, fetchMembers]);
 
   const addMember = async () => {
     if (!newMemberName.trim()) return;
 
     try {
       await api.post(`/teams/${teamId}/members`, {
-        userName: newMemberName, // ✅ updated
+        userName: newMemberName,
       });
 
       setNewMemberName("");
@@ -51,14 +48,11 @@ const TeamCollaboration = ({ teamId }) => {
 
   return (
     <div className="card shadow-sm mb-4">
-      <div className="card-header fw-bold">
-        👥 Team Members
-      </div>
+      <div className="card-header fw-bold">👥 Team Members</div>
 
       <div className="card-body">
         {error && <div className="alert alert-danger">{error}</div>}
 
-        {/* Add Member */}
         <div className="d-flex gap-2 mb-3">
           <input
             className="form-control"
@@ -71,7 +65,6 @@ const TeamCollaboration = ({ teamId }) => {
           </button>
         </div>
 
-        {/* Members List */}
         {members.length === 0 ? (
           <p className="text-muted">No members yet</p>
         ) : (
