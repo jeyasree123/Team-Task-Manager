@@ -18,7 +18,7 @@ const TeamCollaboration = ({ teamId }) => {
 
   useEffect(() => {
     if (teamId) fetchMembers();
-  }, [teamId]);
+  }, [teamId,fetchMembers]);
 
   const addMember = async () => {
     if (!newMemberName.trim()) return;
