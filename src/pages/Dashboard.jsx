@@ -12,27 +12,17 @@ const Dashboard = () => {
     inProgress: 0,
   });
 
-  // 🔥 Normalize status (handles any format)
+  // 🔥 Normalize status
   const normalizeStatus = (status) => {
     return status?.toUpperCase();
   };
 
-  // ✅ FETCH TEAMS
-  const fetchTeams = async () => {
-    try {
-      const res = await api.get("/teams");
-      setTeams(res.data);
-
-      fetchAllTasks(res.data);
-    } catch (err) {
-      console.error("Teams error:", err);
-    }
-  };
-
-  // ✅ FETCH ALL TASKS (SAFE PARALLEL)
+  // ✅ FETCH ALL TASKS
   const fetchAllTasks = async (teamsList) => {
     try {
-      const requests = teamsList.map((team) => api.get(`/tasks/${team.id}`));
+      const requests = teamsList.map((team) =>
+        api.get(`/tasks/${team.id}`)
+      );
 
       const responses = await Promise.allSettled(requests);
 
@@ -72,18 +62,30 @@ const Dashboard = () => {
     });
   };
 
-  // 🔥 SORT TASKS (latest first)
+  // 🔥 SORT TASKS
   const getSortedTasks = () => {
     return [...tasks].sort(
       (a, b) =>
         new Date(b.createdAt || b.created_at || 0) -
-        new Date(a.createdAt || a.created_at || 0),
+        new Date(a.createdAt || a.created_at || 0)
     );
   };
 
+  // ✅ FETCH TEAMS INSIDE useEffect (FIX 🔥)
   useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const res = await api.get("/teams");
+        setTeams(res.data);
+
+        fetchAllTasks(res.data);
+      } catch (err) {
+        console.error("Teams error:", err);
+      }
+    };
+
     fetchTeams();
-  }, [fetchTeams]);
+  }, []);
 
   return (
     <div className="dashboard">
@@ -92,7 +94,7 @@ const Dashboard = () => {
       <div className="container-fluid mt-4">
         <h4 className="text-light">Dashboard</h4>
 
-        {/* 🔥 STATS */}
+        {/* STATS */}
         <div className="row mt-3">
           <div className="col-md-3">
             <div className="card dark-card p-3">
@@ -123,9 +125,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* 🔥 RECENT TASKS + ACTIVITY */}
+        {/* TASKS + ACTIVITY */}
         <div className="row mt-4">
-          {/* ✅ RECENT TASKS */}
           <div className="col-md-8">
             <div className="card dark-card p-3">
               <h5>My Recent Tasks</h5>
@@ -142,8 +143,9 @@ const Dashboard = () => {
                         <span className="text-dark fw-semibold">
                           {task.title || "No Title"}
                         </span>
-
-                        <span className="badge bg-info">{task.status}</span>
+                        <span className="badge bg-info">
+                          {task.status}
+                        </span>
                       </li>
                     ))
                 ) : (
@@ -155,7 +157,6 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* ✅ ACTIVITY FEED */}
           <div className="col-md-4">
             <div className="card dark-card p-3">
               <h5>Activity Feed</h5>
@@ -168,7 +169,6 @@ const Dashboard = () => {
                       <p className="text-muted mb-1">
                         🆕 Created: <strong>{task.title}</strong>
                       </p>
-
                       <small className="text-secondary">
                         Status: {task.status}
                       </small>
