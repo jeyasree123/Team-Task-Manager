@@ -17,51 +17,6 @@ const Dashboard = () => {
     return status?.toUpperCase();
   };
 
-  // ✅ FETCH ALL TASKS
-  const fetchAllTasks = async (teamsList) => {
-    try {
-      const requests = teamsList.map((team) =>
-        api.get(`/tasks/${team.id}`)
-      );
-
-      const responses = await Promise.allSettled(requests);
-
-      let allTasks = [];
-
-      responses.forEach((res) => {
-        if (res.status === "fulfilled") {
-          allTasks = [...allTasks, ...res.value.data];
-        } else {
-          console.error("Task fetch failed:", res.reason);
-        }
-      });
-
-      setTasks(allTasks);
-      calculateStats(allTasks);
-    } catch (err) {
-      console.error("Task error:", err);
-    }
-  };
-
-  // ✅ CALCULATE STATS
-  const calculateStats = (tasksList) => {
-    let pending = 0;
-    let inProgress = 0;
-
-    tasksList.forEach((t) => {
-      const status = normalizeStatus(t.status);
-
-      if (status === "PENDING") pending++;
-      if (status === "IN_PROGRESS") inProgress++;
-    });
-
-    setStats({
-      totalTasks: tasksList.length,
-      pending,
-      inProgress,
-    });
-  };
-
   // 🔥 SORT TASKS
   const getSortedTasks = () => {
     return [...tasks].sort(
@@ -73,6 +28,51 @@ const Dashboard = () => {
 
   // ✅ FETCH TEAMS INSIDE useEffect (FIX 🔥)
   useEffect(() => {
+    // ✅ CALCULATE STATS
+    const calculateStats = (tasksList) => {
+      let pending = 0;
+      let inProgress = 0;
+
+      tasksList.forEach((t) => {
+        const status = normalizeStatus(t.status);
+
+        if (status === "PENDING") pending++;
+        if (status === "IN_PROGRESS") inProgress++;
+      });
+
+      setStats({
+        totalTasks: tasksList.length,
+        pending,
+        inProgress,
+      });
+    };
+
+    // ✅ FETCH ALL TASKS
+    const fetchAllTasks = async (teamsList) => {
+      try {
+        const requests = teamsList.map((team) =>
+          api.get(`/tasks/${team.id}`)
+        );
+
+        const responses = await Promise.allSettled(requests);
+
+        let allTasks = [];
+
+        responses.forEach((res) => {
+          if (res.status === "fulfilled") {
+            allTasks = [...allTasks, ...res.value.data];
+          } else {
+            console.error("Task fetch failed:", res.reason);
+          }
+        });
+
+        setTasks(allTasks);
+        calculateStats(allTasks);
+      } catch (err) {
+        console.error("Task error:", err);
+      }
+    };
+
     const fetchTeams = async () => {
       try {
         const res = await api.get("/teams");
