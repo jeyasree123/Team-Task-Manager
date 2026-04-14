@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback} from "react";
 import api from "../api/authApi";
 
 const TeamCollaboration = ({ teamId }) => {
@@ -15,6 +15,9 @@ const TeamCollaboration = ({ teamId }) => {
       setError("Failed to load members");
     }
   };
+  const fetchMembers = useCallback(() => {
+  // API call here
+}, [teamId]);
 
   useEffect(() => {
     if (teamId) fetchMembers();
