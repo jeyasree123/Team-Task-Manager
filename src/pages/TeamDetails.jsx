@@ -21,7 +21,7 @@ const TeamDetails = () => {
     status: "pending",
   });
 
-  // ✅ normalize status (IMPORTANT FIX)
+  // normalize status
   const normalizeStatus = (status) => {
     if (!status) return "";
     return status.toUpperCase();
@@ -39,20 +39,20 @@ const TeamDetails = () => {
     completed: "COMPLETED",
   };
 
-  // ✅ FETCH TASKS
-  const fetchTasks = async () => {
-    try {
-      const res = await api.get(`/tasks/${teamId}`);
-      setTasks(res.data);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load tasks");
-    }
-  };
-
+  // ✅ FETCH TASKS (FIXED)
   useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const res = await api.get(`/tasks/${teamId}`);
+        setTasks(res.data);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load tasks");
+      }
+    };
+
     if (teamId) fetchTasks();
-  }, [teamId,fetchTasks]);
+  }, [teamId]);
 
   // ✅ SAVE TASK
   const saveTask = async () => {
@@ -83,7 +83,9 @@ const TeamDetails = () => {
       setTaskData({ title: "", description: "", status: "pending" });
       setEditTask(null);
       setShowModal(false);
-      fetchTasks();
+
+      // 🔥 refresh
+      window.location.reload();
 
     } catch (err) {
       console.error(err);
@@ -95,7 +97,7 @@ const TeamDetails = () => {
   const deleteTask = async (taskId) => {
     try {
       await api.delete(`/tasks/${taskId}`);
-      fetchTasks();
+      window.location.reload(); // 🔥 refresh
     } catch (err) {
       console.error(err);
       setError("Failed to delete task");
